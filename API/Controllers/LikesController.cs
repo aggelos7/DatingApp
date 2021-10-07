@@ -27,7 +27,7 @@ namespace API.Controllers
             var sourceUserId = User.GetUserId();
             var likedUser = await _userRepository.GetUserByUsernameAsync(username);
             var sourceUser = await _likesRepository.GetUserWithLikes(sourceUserId);
-
+            
             if (likedUser == null) return NotFound();
 
             if (sourceUser.UserName == username) return BadRequest("You cannot like yourself");
@@ -50,12 +50,14 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedList<LikeDto>>> GetUserLikes([FromQuery] LikesParams likesParams)
+        public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes([FromQuery]LikesParams likesParams)
         {
             likesParams.UserId = User.GetUserId();
             var users = await _likesRepository.GetUserLikes(likesParams);
 
-            Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalCount);
+            Response.AddPaginationHeader(users.CurrentPage, 
+                users.PageSize, users.TotalCount, users.TotalPages);
+
             return Ok(users);
         }
     }

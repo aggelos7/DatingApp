@@ -27,11 +27,13 @@ namespace API.Data
         {
             var users = _context.Users.OrderBy(u => u.UserName).AsQueryable();
             var likes = _context.Likes.AsQueryable();
+
             if (likesParams.Predicate == "liked")
             {
                 likes = likes.Where(like => like.SourceUserId == likesParams.UserId);
                 users = likes.Select(like => like.LikedUser);
             }
+
             if (likesParams.Predicate == "likedBy")
             {
                 likes = likes.Where(like => like.LikedUserId == likesParams.UserId);
@@ -48,7 +50,8 @@ namespace API.Data
                 Id = user.Id
             });
 
-            return await PagedList<LikeDto>.CreateAsync(likedUsers, likesParams.PageNumber, likesParams.PageSize);
+            return await PagedList<LikeDto>.CreateAsync(likedUsers, 
+                likesParams.PageNumber, likesParams.PageSize);
         }
 
         public async Task<AppUser> GetUserWithLikes(int userId)
